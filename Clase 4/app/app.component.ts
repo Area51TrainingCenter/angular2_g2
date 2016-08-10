@@ -68,7 +68,7 @@ export class AppComponent {
       status:false
     };
 
-    pokemon = new Pokemon()
+    pokemon = new Pokemon()i
 
     addPokemon() {
         let locPokemon = new Pokemon();
