@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Pokemon } from './pokemon'
 import { PokemonDetailComponent } from './pokemon-detail.component'
+import { PokemonService } from './pokemon.service'
+import { PokemonJsonService } from './pokemon-json.service'
 
 
 @Component({
@@ -30,6 +32,9 @@ import { PokemonDetailComponent } from './pokemon-detail.component'
   [pokemon]="selectedPokemon"
   [player]="selectedPlayer"></pokemon-detail>
 
+  <button (click)="getPokemons()">Check Pokemon</button>
+  <button (click)="getJsonPokemons()">Get remote Pokemon</button>
+
   `,
     styles: [`
       .selected{
@@ -38,7 +43,8 @@ import { PokemonDetailComponent } from './pokemon-detail.component'
         font-weight: bold;
       }
     `],
-    directives:[PokemonDetailComponent]
+    directives:[PokemonDetailComponent],
+    providers: [PokemonService, PokemonJsonService]
 })
 
 
@@ -50,9 +56,14 @@ export class AppComponent {
     selectedPlayer:string = 'Parzival'
 
     pokemon = new Pokemon();
+    pokemonsRem: Pokemon[] = [];
 
     //keyboardValues: any = null;
     keyboardValues: string = null;
+
+    constructor(
+      private pokemonService: PokemonService,
+      private pokemonJsonService: PokemonJsonService){}
 
     addPokemon() {
         let locPokemon = new Pokemon();
@@ -78,4 +89,30 @@ export class AppComponent {
     onKey(event:KeyboardEvent){
       this.keyboardValues = (<HTMLInputElement>event.target).value;
     }
+
+    getPokemons(){
+      this.pokemonService.getPokemons()
+      .then(pokemons => this.pokemons = pokemons)
+      .catch(this.handleError)
+
+
+      console.log('---')
+      console.log('--->', this.pokemons)
+    }
+
+    handleError(error: any){
+      let errorMsg = error.message
+      return Promise.reject(errorMsg)
+    }
+
+
+    getJsonPokemons(){
+      this.pokemonJsonService.pokemon_json
+      .subscribe(
+          (pokemones: any) => this.pokemonsRem = pokemones,
+          (error: any) => console.error('Error ' +  error),
+          () => console.log(this.pokemonsRem)
+      )
+    }
+
 }

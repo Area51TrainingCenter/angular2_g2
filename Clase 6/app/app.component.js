@@ -11,14 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var pokemon_1 = require('./pokemon');
 var pokemon_detail_component_1 = require('./pokemon-detail.component');
+var pokemon_service_1 = require('./pokemon.service');
+var pokemon_json_service_1 = require('./pokemon-json.service');
 var AppComponent = (function () {
-    function AppComponent() {
+    function AppComponent(pokemonService, pokemonJsonService) {
+        this.pokemonService = pokemonService;
+        this.pokemonJsonService = pokemonJsonService;
         this.titleApp = "Pokedex";
         this.message = "Sin mensaje";
         this.pokemons = [];
         this.selectedPokemon = null;
         this.selectedPlayer = 'Parzival';
         this.pokemon = new pokemon_1.Pokemon();
+        this.pokemonsRem = [];
         //keyboardValues: any = null;
         this.keyboardValues = null;
     }
@@ -42,14 +47,32 @@ var AppComponent = (function () {
     AppComponent.prototype.onKey = function (event) {
         this.keyboardValues = event.target.value;
     };
+    AppComponent.prototype.getPokemons = function () {
+        var _this = this;
+        this.pokemonService.getPokemons()
+            .then(function (pokemons) { return _this.pokemons = pokemons; })
+            .catch(this.handleError);
+        console.log('---');
+        console.log('--->', this.pokemons);
+    };
+    AppComponent.prototype.handleError = function (error) {
+        var errorMsg = error.message;
+        return Promise.reject(errorMsg);
+    };
+    AppComponent.prototype.getJsonPokemons = function () {
+        var _this = this;
+        this.pokemonJsonService.pokemon_json
+            .subscribe(function (pokemones) { return _this.pokemonsRem = pokemones; }, function (error) { return console.error('Error ' + error); }, function () { return console.log(_this.pokemonsRem); });
+    };
     AppComponent = __decorate([
         core_1.Component({
             selector: 'my-app',
-            template: "\n  <h1>My {{ titleApp }}</h1>\n\n  <input (keyup)=\"onKey($event)\">\n  {{ keyboardValues }}\n\n<input [(ngModel)]=\"pokemon.name\" type=\"text\" placeholder=\"Nombre de pokemon\" >\n<input [(ngModel)]=\"pokemon.mainPower\" type=\"text\" placeholder=\"Poder\" >\n<input [(ngModel)]=\"pokemon.type\" type=\"text\" placeholder=\"Tipo\" >\n<input [(ngModel)]=\"pokemon.status\" type=\"text\" placeholder=\"Estatus\" >\n  <button (click)=\"addPokemon()\">Nuevo Pokemon</button>\n  <ul>\n    <li (click)=\"showPokemonDetail(pokemon)\"\n        *ngFor=\"let pokemon of pokemons;  let i = index\"\n        [class.selected]=\"pokemon === selectedPokemon\"\n        >\n    {{ i }}  {{ pokemon.name }}\n    </li>\n  </ul>\n\n  <pokemon-detail\n  *ngIf=\"selectedPokemon != null\"\n  [pokemon]=\"selectedPokemon\"\n  [player]=\"selectedPlayer\"></pokemon-detail>\n\n  ",
+            template: "\n  <h1>My {{ titleApp }}</h1>\n\n  <input (keyup)=\"onKey($event)\">\n  {{ keyboardValues }}\n\n<input [(ngModel)]=\"pokemon.name\" type=\"text\" placeholder=\"Nombre de pokemon\" >\n<input [(ngModel)]=\"pokemon.mainPower\" type=\"text\" placeholder=\"Poder\" >\n<input [(ngModel)]=\"pokemon.type\" type=\"text\" placeholder=\"Tipo\" >\n<input [(ngModel)]=\"pokemon.status\" type=\"text\" placeholder=\"Estatus\" >\n  <button (click)=\"addPokemon()\">Nuevo Pokemon</button>\n  <ul>\n    <li (click)=\"showPokemonDetail(pokemon)\"\n        *ngFor=\"let pokemon of pokemons;  let i = index\"\n        [class.selected]=\"pokemon === selectedPokemon\"\n        >\n    {{ i }}  {{ pokemon.name }}\n    </li>\n  </ul>\n\n  <pokemon-detail\n  *ngIf=\"selectedPokemon != null\"\n  [pokemon]=\"selectedPokemon\"\n  [player]=\"selectedPlayer\"></pokemon-detail>\n\n  <button (click)=\"getPokemons()\">Check Pokemon</button>\n  <button (click)=\"getJsonPokemons()\">Get remote Pokemon</button>\n\n  ",
             styles: ["\n      .selected{\n        background-color: blue;\n        color: white;\n        font-weight: bold;\n      }\n    "],
-            directives: [pokemon_detail_component_1.PokemonDetailComponent]
+            directives: [pokemon_detail_component_1.PokemonDetailComponent],
+            providers: [pokemon_service_1.PokemonService, pokemon_json_service_1.PokemonJsonService]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [pokemon_service_1.PokemonService, pokemon_json_service_1.PokemonJsonService])
     ], AppComponent);
     return AppComponent;
 }());
