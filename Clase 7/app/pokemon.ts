@@ -4,6 +4,7 @@ export class Pokemon {
   mainPower: string;
   type: string;
   status: boolean;
+  caughtDate: Date;
 
   constructor(){
     console.log('Ha nacido un nuevo Pokemon')
