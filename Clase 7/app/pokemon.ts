@@ -8,5 +8,6 @@ export class Pokemon {
 
   constructor(){
     console.log('Ha nacido un nuevo Pokemon')
+    //this.caughtDate = new Date();
   }
 }
